@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Med clock</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050303">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="robots" content="noindex">
+<style>
+ :root{--bg:#050303;--fg:#e8e2dc;--dim:#8a827a;--red:#ff5a4d;--amber:#ffa62b;--yellow:#e6d34a;--green:#4fbf7f}
+ *{box-sizing:border-box}
+ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:-apple-system,Helvetica,Arial,sans-serif;-webkit-user-select:none;user-select:none}
+ .wrap{display:flex;height:100%;padding:3vh 3vw;gap:3vw}
+ .left{width:37%;display:flex;flex-direction:column;justify-content:space-between}
+ #time{font-size:13.5vw;line-height:.9;font-weight:200;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+ #date{font-size:3vw;color:var(--dim);margin-top:1.5vh}
+ .tools button{background:#16110f;color:var(--dim);border:1px solid #2a221e;border-radius:10px;padding:1.2vh 1.6vw;font-size:1.8vw;margin-right:1vw}
+ .right{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1vh}
+ .row{flex:1 1 0;min-height:0;display:flex;align-items:center;gap:1.4vw;background:#0e0a09;border-left:.7vw solid var(--dim);border-radius:10px;padding:.6vh 1.2vw;overflow:hidden}
+ .row.red{border-color:var(--red)}.row.amber{border-color:var(--amber)}.row.yellow{border-color:var(--yellow)}.row.green{border-color:var(--green)}
+ .days{width:7vw;text-align:center}.days b{display:block;font-size:3.6vw;font-weight:300;line-height:1}.days span{font-size:1.2vw;color:var(--dim)}
+ .row.red .days b{color:var(--red)}.row.amber .days b{color:var(--amber)}.row.yellow .days b{color:var(--yellow)}.row.green .days b{color:var(--green)}
+ .info{flex:1;min-width:0}.name{font-size:2.1vw;white-space:nowrap}.meta{font-size:1.5vw;color:var(--dim);margin-top:.2vh;white-space:nowrap}.note{font-size:1.3vw;color:#8a6f4d;max-width:15vw;text-align:right;line-height:1.15}
+ .empty{font-size:2vw;color:var(--dim)}
+ #edit{display:none;position:fixed;inset:0;background:#050303;overflow:auto;padding:3vh 3vw;z-index:5;-webkit-user-select:text;user-select:text}
+ #edit h2{font-weight:300;font-size:2.6vw}
+ #edit textarea{width:100%;height:16vh;background:#0e0a09;color:var(--fg);border:1px solid #2a221e;border-radius:8px;font-size:1.6vw}
+ #edit button{background:#1e2a22;color:var(--fg);border:1px solid #2f4a38;border-radius:8px;padding:1vh 1.6vw;font-size:1.8vw;margin:1vh 1vw 1vh 0}
+ .erow{display:flex;flex-wrap:wrap;align-items:center;gap:1.2vw;padding:1vh 0;border-bottom:1px solid #1d1714;font-size:1.7vw}
+ .erow input,#edit .add input{background:#0e0a09;color:var(--fg);border:1px solid #2a221e;border-radius:6px;padding:.7vh .8vw;font-size:1.7vw;width:11vw}
+ .en{width:20vw}.add input{margin-right:1vw}
+ #msg{color:var(--amber);font-size:1.7vw;min-height:3vh}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="left">
+  <div><div id="time">--:--</div><div id="date"></div></div>
+  <div class="tools"><button id="editBtn">Edit</button><button id="fsBtn">Full screen</button></div>
+ </div>
+ <div class="right" id="list"></div>
+</div>
+<div id="edit">
+ <h2>Edit medicines</h2>
+ <div id="msg"></div>
+ <div id="editlist"></div>
+ <h2>Add one</h2>
+ <div class="add"><input id="newName" placeholder="Name"><input id="newUnit" placeholder="Unit (tablets)"><input id="newCount" type="number" placeholder="Count"><input id="newPer" type="number" step="any" placeholder="Per day"><button id="addBtn">Add</button></div>
+ <h2>Import / backup</h2>
+ <textarea id="json" placeholder="Paste the data file text here, then tap Import"></textarea>
+ <div><button id="importBtn">Import</button><button id="exportBtn">Show backup text</button><button id="doneBtn">Done</button></div>
+ <p style="color:#6d665f;font-size:1.4vw">Everything here is stored only in this browser. It is not sent anywhere.</p>
+</div>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
