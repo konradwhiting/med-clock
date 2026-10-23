@@ -7,6 +7,7 @@
   // ?sheet=off to go back to local data. The link is kept in this browser only, never in the repo.
   var SHEET_KEY = 'medclock.sheet', CACHE_KEY = 'medclock.sheetcache';
   var sheetUrl = '', cachedAt = null;
+  var showEdit = /[?&]edit=1/.test(location.search); // the Edit button is hidden unless the address ends ?edit=1
   try {
     var qs = /[?&]sheet=([^&]*)/.exec(location.search);
     if (qs) {
@@ -156,9 +157,9 @@
   });
 
   load(); tick(); render();
+  if (!showEdit) $('editBtn').style.display = 'none';
   if (sheetUrl) {
     // Medicines come from the shared sheet, so there is nothing to edit on this screen.
-    $('editBtn').style.display = 'none';
     if (cachedAt) syncNote('Showing ' + hhmm(cachedAt) + ' data');
     fetchSheet();
     setInterval(fetchSheet, 6 * 60 * 60 * 1000); // four times a day, plus whenever the page loads or wakes

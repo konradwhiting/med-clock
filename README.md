@@ -38,7 +38,7 @@ published to the web as CSV (File, Share, Publish to web, CSV). Open the page on
 The link is saved in that browser's local storage only, then removed from the address bar. After that
 the page reads the sheet when it loads or wakes and every 6 hours (four times a day), keeps the last
 good copy for when the device is offline, and shows "Updated hh:mm" at the top right. The Edit button is
-hidden in this mode. Google delays published changes by a few minutes. Use `?sheet=off` to go back to
+hidden everywhere unless the address ends in `?edit=1` (local mode only needs it). Google delays published changes by a few minutes. Use `?sheet=off` to go back to
 local mode. Anyone with the published link can read the list, so keep it private.
 
 **2. Local data (fallback).** With no sheet set, data is stored in the browser's local storage (key
