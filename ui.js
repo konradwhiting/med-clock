@@ -160,7 +160,7 @@
     $('editBtn').style.display = 'none';
     if (cachedAt) syncNote('Showing ' + hhmm(cachedAt) + ' data');
     fetchSheet();
-    setInterval(fetchSheet, 300000);
+    setInterval(fetchSheet, 6 * 60 * 60 * 1000); // four times a day, plus whenever the page loads or wakes
     document.addEventListener('visibilitychange', function () { if (!document.hidden) fetchSheet(); });
   }
   setInterval(tick, 30000);

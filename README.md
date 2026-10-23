@@ -18,4 +18,4 @@ is left today, adds the new amount and restarts the count from today.
 Shared sheet option: the medicines can come from a Google Sheet published as CSV (columns Name, Unit,
 Counted, Count date as YYYY-MM-DD, Per day, Note). Open the page once with `?sheet=<the published link>`
 to switch it on; the link is stored in that browser only and is not in this repo. Use `?sheet=off` to go
-back to local data. In sheet mode the page refreshes every 5 minutes and the Edit button is hidden.
+back to local data. In sheet mode the page refreshes four times a day (and when it loads or wakes) and the Edit button is hidden.
