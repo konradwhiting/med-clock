@@ -12,10 +12,10 @@
 
   function tick() {
     var n = new Date();
-    function z(v) { return (v < 10 ? '0' : '') + v; }
-    $('time').textContent = z(n.getHours()) + ':' + z(n.getMinutes());
-    var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    $('date').textContent = days[n.getDay()] + ' ' + M.fmtDate(n);
+    var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    $('day').textContent = days[n.getDay()];
+    $('date').textContent = n.getDate() + ' ' + months[n.getMonth()];
   }
 
   function render() {
@@ -28,12 +28,13 @@
       var big = r.daysLeft === null ? '–' : r.daysLeft;
       var sub = r.daysLeft === null ? 'as needed' : (r.daysLeft === 1 ? 'day left' : 'days left');
       var fl = Math.floor(r.left), unit = r.unit && fl === 1 ? r.unit.replace(/s$/, '') : r.unit;
-      var left = fl + (unit ? ' ' + esc(unit) : '') + ' left';
-      var run = r.runOut ? 'runs out ' + M.fmtDate(r.runOut) : '';
+      var left = fl + (unit ? ' ' + esc(unit) : '');
+      var run = r.runOut ? 'out ' + M.fmtDate(r.runOut) : '';
       html += '<div class="row ' + lvl + '"><div class="days"><b>' + big + '</b><span>' + sub + '</span></div>' +
-        '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + left + (run ? ' · ' + run : '') + '</div></div>' +
-        (r.note ? '<div class="note">' + esc(r.note) + '</div>' : '') + '</div>';
+        '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + left + (run ? ' · ' + run : '') + '</div></div></div>';
     });
+    // Two columns, filled top to bottom: at least 5 rows so the cards stay a sensible size.
+    $('list').style.gridTemplateRows = 'repeat(' + Math.max(5, Math.ceil(rows.length / 2)) + ', minmax(0, 1fr))';
     $('list').innerHTML = html;
     var d = $('editlist'); if (!d) return;
     var e = '';
@@ -91,6 +92,6 @@
   });
 
   load(); tick(); render();
-  setInterval(tick, 1000);
+  setInterval(tick, 30000);
   setInterval(function () { if ($('edit').style.display !== 'block') render(); }, 60000);
 })();
