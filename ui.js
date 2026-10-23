@@ -32,7 +32,7 @@
     if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
     return rows;
   }
-  // Columns: Name, Unit, Counted, Count date (YYYY-MM-DD), Per day, Note.
+  // Columns: Name, Unit, Counted, Count date (YYYY-MM-DD), Per day, Note, Type (Rx or OTC).
   function sheetToMeds(text) {
     var rows = parseCsv(text), out = [], i, r;
     for (i = 1; i < rows.length; i++) {
@@ -40,7 +40,7 @@
       if (!r[0] || !r[0].trim()) continue;
       var d = (r[3] || '').trim();
       out.push({ name: r[0].trim(), unit: (r[1] || '').trim(), counted: Number(r[2]) || 0,
-        countDate: /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : M.isoDate(new Date()), perDay: Number(r[4]) || 0, note: (r[5] || '').trim() });
+        countDate: /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : M.isoDate(new Date()), perDay: Number(r[4]) || 0, note: (r[5] || '').trim(), type: (r[6] || '').trim() });
     }
     return out;
   }
@@ -94,7 +94,8 @@
       var left = fl + (unit ? ' ' + esc(unit) : '');
       var run = r.runOut ? 'out ' + M.fmtDate(r.runOut) : '';
       html += '<div class="row ' + lvl + '"><div class="days"><b>' + big + '</b><span>' + sub + '</span></div>' +
-        '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + left + (run ? ' · ' + run : '') + '</div></div></div>';
+        '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + left + (run ? ' · ' + run : '') + '</div></div>' +
+        (r.type ? '<div class="tag ' + (/^rx$/i.test(r.type) ? 'rx' : 'otc') + '">' + esc(r.type) + '</div>' : '') + '</div>';
     });
     // Two columns, filled top to bottom: at least 5 rows so the cards stay a sensible size.
     $('list').style.gridTemplateRows = 'repeat(' + Math.max(5, Math.ceil(rows.length / 2)) + ', minmax(0, 1fr))';
