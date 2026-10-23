@@ -21,7 +21,7 @@
     var perDay = Number(med.perDay) || 0;
     var elapsed = Math.max(0, dayNumber(now) - dayNumber(parseDate(med.countDate)));
     var left = Math.max(0, counted - perDay * elapsed);
-    var out = { name: med.name, unit: med.unit || '', left: left, perDay: perDay, note: med.note || '', type: med.type || '', daysLeft: null, runOut: null };
+    var out = { name: med.name, unit: med.unit || '', left: left, perDay: perDay, note: med.note || '', type: med.type || '', tbc: !!med.tbc, daysLeft: null, runOut: null };
     if (perDay > 0) {
       out.daysLeft = Math.floor(left / perDay + 1e-9);
       var r = new Date(now.getFullYear(), now.getMonth(), now.getDate() + out.daysLeft);

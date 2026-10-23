@@ -30,7 +30,7 @@ loads or wakes and once a minute while open; the day rolls over at midnight on t
 ## Where the data comes from (two modes)
 
 **1. Google Sheet (what is used day to day).** The medicines live in a Google Sheet with the columns
-`Name, Unit, Counted, Count date, Per day, Note, Type` (one medicine per row, dates as YYYY-MM-DD; Type is Rx or OTC and shows as a small tag on the row, blank shows nothing). The sheet is
+`Name, Unit, Counted, Count date, Per day, Note, Type` (one medicine per row, dates as YYYY-MM-DD; Type is Rx or OTC and shows as a small tag on the row, blank shows nothing). Put `TBC` in Counted or Per day when a number is not known yet: the row shows a grey "?" and "TBC" instead of a countdown. The sheet is
 published to the web as CSV (File, Share, Publish to web, CSV). Open the page once on the device with
 
     https://konradwhiting.github.io/med-clock/?sheet=<the published CSV link, URL-encoded>

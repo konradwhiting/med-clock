@@ -40,7 +40,8 @@
       r = rows[i];
       if (!r[0] || !r[0].trim()) continue;
       var d = (r[3] || '').trim();
-      out.push({ name: r[0].trim(), unit: (r[1] || '').trim(), counted: Number(r[2]) || 0,
+      var tbc = /^\s*tbc\s*$/i.test(r[2] || '') || /^\s*tbc\s*$/i.test(r[4] || ''); // "TBC" in Counted or Per day = not known yet
+      out.push({ name: r[0].trim(), unit: (r[1] || '').trim(), counted: Number(r[2]) || 0, tbc: tbc,
         countDate: /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : M.isoDate(new Date()), perDay: Number(r[4]) || 0, note: (r[5] || '').trim(), type: (r[6] || '').trim() });
     }
     return out;
@@ -89,13 +90,13 @@
     if (!rows.length) html = '<p class="empty">' + (sheetUrl ? 'Loading the medicines from the sheet…' : 'No medicines yet. Tap Edit, then Import to paste your data.') + '</p>';
     rows.forEach(function (r) {
       var lvl = M.level(r.daysLeft);
-      var big = r.daysLeft === null ? '–' : r.daysLeft;
-      var sub = r.daysLeft === null ? 'as needed' : (r.daysLeft === 1 ? 'day left' : 'days left');
+      var big = r.tbc ? '?' : (r.daysLeft === null ? '–' : r.daysLeft);
+      var sub = r.tbc ? 'TBC' : (r.daysLeft === null ? 'as needed' : (r.daysLeft === 1 ? 'day left' : 'days left'));
       var fl = Math.floor(r.left), unit = r.unit && fl === 1 ? r.unit.replace(/s$/, '') : r.unit;
       var left = fl + (unit ? ' ' + esc(unit) : '');
       var run = r.runOut ? 'out ' + M.fmtDate(r.runOut) : '';
       html += '<div class="row ' + lvl + '"><div class="days"><b>' + big + '</b><span>' + sub + '</span></div>' +
-        '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + left + (run ? ' · ' + run : '') + '</div></div>' +
+        '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + (r.tbc ? 'How many left and how often: TBC' : left + (run ? ' · ' + run : '')) + '</div></div>' +
         (r.type ? '<div class="tag ' + (/^rx$/i.test(r.type) ? 'rx' : 'otc') + '">' + esc(r.type) + '</div>' : '') + '</div>';
     });
     // Two columns, filled top to bottom: at least 5 rows so the cards stay a sensible size.
