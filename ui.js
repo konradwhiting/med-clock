@@ -3,7 +3,70 @@
   var $ = function (id) { return document.getElementById(id); };
   var meds = [];
 
+  // Optional shared Google Sheet (published as CSV). Open the page once with ?sheet=<link> to set it,
+  // ?sheet=off to go back to local data. The link is kept in this browser only, never in the repo.
+  var SHEET_KEY = 'medclock.sheet', CACHE_KEY = 'medclock.sheetcache';
+  var sheetUrl = '', cachedAt = null;
+  try {
+    var qs = /[?&]sheet=([^&]*)/.exec(location.search);
+    if (qs) {
+      var given = decodeURIComponent(qs[1]);
+      if (given === 'off') localStorage.removeItem(SHEET_KEY);
+      else if (/^https:\/\/docs\.google\.com\/spreadsheets\//.test(given)) localStorage.setItem(SHEET_KEY, given);
+      history.replaceState(null, '', location.pathname);
+    }
+    sheetUrl = localStorage.getItem(SHEET_KEY) || '';
+  } catch (e) {}
+
+  function parseCsv(text) {
+    var rows = [], row = [], cell = '', q = false, i, c;
+    for (i = 0; i < text.length; i++) {
+      c = text.charAt(i);
+      if (q) {
+        if (c === '"') { if (text.charAt(i + 1) === '"') { cell += '"'; i++; } else q = false; } else cell += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text.charAt(i + 1) === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+  // Columns: Name, Unit, Counted, Count date (YYYY-MM-DD), Per day, Note.
+  function sheetToMeds(text) {
+    var rows = parseCsv(text), out = [], i, r;
+    for (i = 1; i < rows.length; i++) {
+      r = rows[i];
+      if (!r[0] || !r[0].trim()) continue;
+      var d = (r[3] || '').trim();
+      out.push({ name: r[0].trim(), unit: (r[1] || '').trim(), counted: Number(r[2]) || 0,
+        countDate: /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : M.isoDate(new Date()), perDay: Number(r[4]) || 0, note: (r[5] || '').trim() });
+    }
+    return out;
+  }
+  function hhmm(d) { function z(v) { return (v < 10 ? '0' : '') + v; } return z(d.getHours()) + ':' + z(d.getMinutes()); }
+  function syncNote(t) { var el = $('sync'); if (el) el.textContent = t; }
+  function fetchSheet() {
+    fetch(sheetUrl, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
+      .then(function (t) {
+        var d = sheetToMeds(t);
+        if (!d.length) throw new Error('no rows');
+        meds = d; cachedAt = new Date();
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: cachedAt.getTime(), meds: d })); } catch (e) {}
+        syncNote('Updated ' + hhmm(cachedAt)); render();
+      })
+      .catch(function () { syncNote(cachedAt ? 'Sheet not reachable, showing ' + hhmm(cachedAt) + ' data' : 'Sheet not reachable'); });
+  }
+
   function load() {
+    if (sheetUrl) {
+      try {
+        var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (c && Array.isArray(c.meds)) { meds = c.meds; cachedAt = new Date(c.at); }
+      } catch (e) { meds = []; }
+      return;
+    }
     try { meds = JSON.parse(localStorage.getItem(M.KEY) || '[]'); } catch (e) { meds = []; }
     if (!Array.isArray(meds)) meds = [];
   }
@@ -22,7 +85,7 @@
     var now = new Date();
     var rows = M.sortRows(meds.map(function (m) { return M.compute(m, now); }));
     var html = '';
-    if (!rows.length) html = '<p class="empty">No medicines yet. Tap Edit, then Import to paste your data.</p>';
+    if (!rows.length) html = '<p class="empty">' + (sheetUrl ? 'Loading the medicines from the sheet…' : 'No medicines yet. Tap Edit, then Import to paste your data.') + '</p>';
     rows.forEach(function (r) {
       var lvl = M.level(r.daysLeft);
       var big = r.daysLeft === null ? '–' : r.daysLeft;
@@ -92,6 +155,14 @@
   });
 
   load(); tick(); render();
+  if (sheetUrl) {
+    // Medicines come from the shared sheet, so there is nothing to edit on this screen.
+    $('editBtn').style.display = 'none';
+    if (cachedAt) syncNote('Showing ' + hhmm(cachedAt) + ' data');
+    fetchSheet();
+    setInterval(fetchSheet, 300000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) fetchSheet(); });
+  }
   setInterval(tick, 30000);
   setInterval(function () { if ($('edit').style.display !== 'block') render(); }, 60000);
 })();
