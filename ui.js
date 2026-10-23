@@ -97,7 +97,7 @@
       var run = r.runOut ? 'out ' + M.fmtDate(r.runOut) : '';
       html += '<div class="row ' + lvl + '"><div class="days"><b>' + big + '</b><span>' + sub + '</span></div>' +
         '<div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + (r.tbc ? 'How many left and how often: TBC' : left + (run ? ' · ' + run : '')) + '</div></div>' +
-        (r.type ? '<div class="tag ' + (/^rx$/i.test(r.type) ? 'rx' : 'otc') + '">' + esc(r.type) + '</div>' : '') + '</div>';
+        (r.type ? '<div class="tag ' + (/^(rx|prescription)$/i.test(r.type) ? 'rx' : 'otc') + '">' + (/^(rx|prescription)$/i.test(r.type) ? 'Prescription' : esc(r.type)) + '</div>' : '') + '</div>';
     });
     // Two columns, filled top to bottom: at least 5 rows so the cards stay a sensible size.
     $('list').style.gridTemplateRows = 'repeat(' + Math.max(5, Math.ceil(rows.length / 2)) + ', minmax(0, 1fr))';
