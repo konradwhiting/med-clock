@@ -1,4 +1,4 @@
-# med-clock
+# Med board (repo name: med-clock)
 
 A bedside screen that counts down medicine supplies. Built for an old iPad in landscape.
 Live at https://konradwhiting.github.io/med-clock/ (GitHub Pages, main branch, root folder).
