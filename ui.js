@@ -42,6 +42,8 @@
         '<label>Counted <input data-i="' + i + '" data-k="counted" type="number" value="' + esc(m.counted) + '"></label>' +
         '<label>On <input data-i="' + i + '" data-k="countDate" type="date" value="' + esc(m.countDate) + '"></label>' +
         '<label>Per day <input data-i="' + i + '" data-k="perDay" type="number" step="any" value="' + esc(m.perDay || 0) + '"></label>' +
+        '<label>New supply <input data-r="' + i + '" type="number" step="any" placeholder="how many"></label>' +
+        '<button data-restock="' + i + '">Add supply</button>' +
         '<button data-del="' + i + '">Remove</button></div>';
     });
     d.innerHTML = e;
@@ -54,7 +56,20 @@
     if (t.id === 'editBtn') openEdit($('edit').style.display !== 'block');
     if (t.id === 'doneBtn') openEdit(false);
     if (t.id === 'fsBtn') { var el = document.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el); }
-    if (t.getAttribute && t.getAttribute('data-del') !== null) { meds.splice(+t.getAttribute('data-del'), 1); save(); render(); }
+    if (t.getAttribute && t.getAttribute('data-del') !== null) {
+      var di = +t.getAttribute('data-del');
+      if (confirm('Remove ' + meds[di].name + '?')) { meds.splice(di, 1); save(); render(); }
+    }
+    if (t.getAttribute && t.getAttribute('data-restock') !== null) {
+      // New repeat arrived: count what is left today, add the new supply, restart the count from today.
+      var ri = +t.getAttribute('data-restock'), box = document.querySelector('input[data-r="' + ri + '"]');
+      var qty = box ? parseFloat(box.value) : NaN;
+      if (!(qty > 0)) { $('msg').textContent = 'Type how many you received, then tap Add supply.'; return; }
+      var now = new Date(), cur = M.compute(meds[ri], now).left;
+      meds[ri].counted = Math.round((cur + qty) * 100) / 100;
+      meds[ri].countDate = M.isoDate(now);
+      save(); $('msg').textContent = 'Added ' + qty + ' to ' + meds[ri].name + '.'; render();
+    }
     if (t.id === 'importBtn') {
       try {
         var data = JSON.parse($('json').value);
